@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { auth, googleProvider } from "../firebaseConfig";
+import { auth, DEMO_CREDENTIALS, googleProvider } from "../firebaseConfig";
 import { createUserWithEmailAndPassword, sendEmailVerification, signInWithPopup } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { FaGoogle } from "react-icons/fa"; 
@@ -19,6 +19,17 @@ const SignUp = () => {
       return;
     }
 
+    if (email === DEMO_CREDENTIALS.email && password === DEMO_CREDENTIALS.password) {
+      alert("Demo account is ready. You can log in with the demo credentials.");
+      navigate("/login");
+      return;
+    }
+
+    if (!auth) {
+      alert("Use the demo account or configure Firebase in a .env file.");
+      return;
+    }
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
@@ -31,6 +42,11 @@ const SignUp = () => {
   };
 
   const handleGoogleSignUp = async () => {
+    if (!auth || !googleProvider) {
+      alert("Firebase is not configured. Add the values from .env.example to a .env file.");
+      return;
+    }
+
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;

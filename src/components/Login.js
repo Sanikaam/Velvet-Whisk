@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { auth, googleProvider } from "../firebaseConfig";
+import { auth, DEMO_CREDENTIALS, googleProvider } from "../firebaseConfig";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { FaGoogle } from "react-icons/fa";
@@ -13,6 +13,17 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (email === DEMO_CREDENTIALS.email && password === DEMO_CREDENTIALS.password) {
+      alert("Demo login successful!");
+      navigate("/home");
+      return;
+    }
+
+    if (!auth) {
+      alert("Use the demo account or configure Firebase in a .env file.");
+      return;
+    }
+
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       if (userCredential.user.emailVerified) {
@@ -28,6 +39,11 @@ const Login = () => {
   };
 
   const handleGoogleLogin = async () => {
+    if (!auth || !googleProvider) {
+      alert("Firebase is not configured. Add the values from .env.example to a .env file.");
+      return;
+    }
+
     try {
       const result = await signInWithPopup(auth, googleProvider);
       alert("Google login successful!");
